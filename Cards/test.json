@@ -1,0 +1,17 @@
+﻿{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "speak": "Appointment List",
+  "body": [
+    {
+      "type": "TextBlock",
+      "size": "large",
+      "text": "Hello"
+    },
+    {
+      "type": "Image",
+      "url": "http://adaptivecards.io/content/cats/1.png"
+    }
+  ]
+}

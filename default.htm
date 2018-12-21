@@ -1,14 +1,97 @@
 ﻿<!DOCTYPE html>
 <html>
 <head>
-    <title></title>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Bot Chat</title>
+
+    <link href="https://cdn.botframework.com/botframework-webchat/latest/botchat.css" rel="stylesheet" />
+    <style type="text/css">
+        #BotChatGoesHere .wc-chatview-panel {
+            height: 95%;
+            width: 50%;
+            border: 1px solid lightgray;
+        }
+    </style>
 </head>
-<body style="font-family:'Segoe UI'">
-    <h1>Emergency Services Bot</h1>
-    <p>Simple IVR Bot implementation based around an Emergency Services scenario</p>
-    <p>Uses MS Cognitive Services to convert audio stream to text </p>
-    <p>Visit <a href="https://www.botframework.com/">Bot Framework</a> to register your bot. When you register it, remember to set your bot's endpoint to <pre>https://<i>your_bots_hostname</i>/api/messages</pre></p>
+<body>
+    <div id="BotChatGoesHere"></div>
+
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/botchat.js"></script>
+
+    <!-- If you do not want to use Cognitive Services library, comment out the following line -->
+    <script src="https://cdn.botframework.com/botframework-webchat/latest/CognitiveServices.js"></script>
+
+    <script>
+        // Get parameters from query
+        var params = BotChat.queryParams(location.search);
+        // Language definition
+        var chatLocale = params['locale'] || window.navigator.language;
+
+        var user = {
+            id: params['userid'] || 'userid',
+            name: params['username'] || 'username'
+        };
+
+        var bot = {
+            id: params['botid'] || 'botid',
+            name: params['botname'] || 'botname'
+        };
+
+        window.botchatDebug = params['debug'] && params['debug'] === 'true';
+
+        // Connection settings
+        var botConnectionSettings = new BotChat.DirectLine({
+            domain: params['domain'],
+            secret: 'ZWmJk93o7dI.cwA.tx0.LS8U81WremIvS305mIpFyR14_2exB3ThM8EMk2e2_pk',
+            token: params['t'],
+            webSocket: params['webSocket'] && params['webSocket'] === 'true'
+        });
+
+        function getToken() {
+            // Normally this token fetch is done from your secured backend to avoid exposing the API key and this call
+            // would be to your backend, or to retrieve a token that was served as part of the original page.
+            return fetch(
+                'https://api.cognitive.microsoft.com/sts/v1.0/issueToken',
+                {
+                    headers: {
+                        'Ocp-Apim-Subscription-Key': '0faabb719ca046fca9c2db30516cff47'
+                    },
+                    method: 'POST'
+                }
+            ).then(res => res.text());
+        }
+
+        var speechOptions = {
+            speechRecognizer: new CognitiveServices.SpeechRecognizer({
+                fetchCallback: (authFetchEventId) => getToken(),
+                fetchOnExpiryCallback: (authFetchEventId) => getToken()
+            }),
+            speechSynthesizer: new CognitiveServices.SpeechSynthesizer({
+                gender: CognitiveServices.SynthesisGender.Female,
+                subscriptionKey: '0faabb719ca046fca9c2db30516cff47',
+                voiceName: 'Microsoft Server Speech Text to Speech Voice (en-US, JessaRUS)'
+            })
+        };
+
+        // Webchat init
+        BotChat.App({
+            botConnection: botConnectionSettings,
+            speechOptions: speechOptions,
+            user: user,
+            bot: bot,
+            locale: chatLocale,
+            resize: 'detect'
+        }, document.getElementById('BotChatGoesHere'));
+
+        // Send hidden message to do what you want
+        botConnectionSettings.postActivity({
+            type: 'event',
+            from: { id: user.id },
+            locale: chatLocale,
+            name: 'welComeEvent',
+            value: ''
+        }).subscribe(function (id) { console.log('event sent'); });
+    </script>
 </body>
 </html>
-

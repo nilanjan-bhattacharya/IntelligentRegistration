@@ -1,0 +1,52 @@
+﻿{
+  "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+  "type": "AdaptiveCard",
+  "version": "1.0",
+  "speak": "Appointment List",
+  "body": [
+    {
+      "type": "ColumnSet",
+      "spacing": "medium",
+      "separator": true,
+      "columns": [
+        {
+          "type": "Column",
+          "width": 1,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "Appointment Date",
+              "isSubtle": true,
+              "weight": "bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "#AppointmentDate",
+              "spacing": "small"
+            }
+          ]
+        },
+        {
+          "type": "Column",
+          "width": 1,
+          "items": [
+            {
+              "type": "TextBlock",
+              "text": "OtherField1",
+              "isSubtle": true,
+              "horizontalAlignment": "center",
+              "weight": "bolder"
+            },
+            {
+              "type": "TextBlock",
+              "text": "#OtherField1",
+              "weight": "bolder",
+              "horizontalAlignment": "center",
+              "spacing": "small"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

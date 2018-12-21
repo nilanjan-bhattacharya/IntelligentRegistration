@@ -5,6 +5,7 @@
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
+    using Microsoft.Bot.Builder.Dialogs;
     using Microsoft.Bot.Connector;
 
     [BotAuthentication]
@@ -18,14 +19,33 @@
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                ConnectorClient connector = new ConnectorClient(new Uri(activity.ServiceUrl));
-                
-                // calculate something for us to return
-                int length = (activity.Text ?? string.Empty).Length;
+                await Conversation.SendAsync(activity, () => new RootDialog());
+            }
+            // Webchat: getting an "event" activity for our js code
+            else if (activity.Type == ActivityTypes.Event && activity.ChannelId == "webchat")
+            {
+                var receivedEvent = activity.AsEventActivity();
 
-                // return our reply to the user
-                Activity reply = activity.CreateReply($"You sent {activity.Text} which was {length} characters");
-                await connector.Conversations.ReplyToActivityAsync(reply);
+                if ("welComeEvent".Equals(receivedEvent.Name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    await EchoLocaleAsync(activity, activity.Locale);
+                }
+            }
+            // Sample for Skype: locale is provided in ContactRelationUpdate event
+            else if (activity.Type == ActivityTypes.ContactRelationUpdate && activity.ChannelId == "skype")
+            {
+                await EchoLocaleAsync(activity, activity.Entities[0].Properties["locale"].ToString());
+            }
+            // Sample for emulator, to debug locales
+            else if (activity.Type == ActivityTypes.ConversationUpdate && activity.ChannelId == "emulator")
+            {
+                foreach (var userAdded in activity.MembersAdded)
+                {
+                    if (userAdded.Id == activity.From.Id)
+                    {
+                        await EchoLocaleAsync(activity, "fr-FR");
+                    }
+                }
             }
             else
             {
@@ -34,6 +54,13 @@
 
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+        private async Task EchoLocaleAsync(Activity activity, string inputLocale)
+        {
+            Activity reply = activity.CreateReply("Welcome, I'm Dr.Bot ! I can help with fix an appointment with Doctor.");
+            var connector = new ConnectorClient(new Uri(activity.ServiceUrl));
+            await connector.Conversations.SendToConversationAsync(reply);
         }
 
         private Activity HandleSystemMessage(Activity message)
