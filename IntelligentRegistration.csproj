@@ -219,6 +219,7 @@
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\EmergencyServicesBot05102018 - Web Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\EmergencyServicesBot08102018 - Web Deploy.pubxml" />
+    <None Include="Properties\PublishProfiles\IntelligentRegistration - Web Deploy.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
